@@ -1,4 +1,4 @@
-# LEVITAS  
+# LEVITAS 
 **LEVITation via Active Stabilization**
 
 ## Overview
