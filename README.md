@@ -116,3 +116,5 @@ This enables stabilization around a desired height while providing insight into 
 LEVITAS demonstrates how software-defined control transforms an inherently unstable physical system into a controllable one.
 
 ---
+## Notice
+**Kindly note that the repository is under works and the project is ongoing, updates and modifications will be carried out periodically. Refrain from using code and content outside academic/educational learning.**
