@@ -1,4 +1,5 @@
-# LEVITAS **LEVITation via Active Stabilization**
+# LEVITAS
+**LEVITation via Active Stabilization**
 
 ## Overview
 LEVITAS investigates **active magnetic levitation using feedback control**, aiming to enable **contactless, vibration-free containment** of objects inside a controlled chamber. Unlike passive magnetic levitation systems, which are fundamentally unstable, LEVITAS relies on **real-time sensing and electromagnetic actuation** to dynamically stabilize a levitated object.
