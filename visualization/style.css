@@ -1,0 +1,97 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #0b1c2d;
+  color: white;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  color: #9fdfff;
+  margin-bottom: 15px;
+}
+
+.layout {
+  display: flex;
+  gap: 20px;
+}
+
+canvas {
+  border: 2px solid #00bcd4;
+  background: #06121f;
+}
+
+.legend {
+  width: 300px;
+  background: #0f2a44;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.legend h2 {
+  margin-top: 10px;
+  margin-bottom: 8px;
+  color: #00bcd4;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.box {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  border-radius: 3px;
+}
+
+.chamber {
+  border: 2px solid #00bcd4;
+  background: transparent;
+}
+
+.magnet {
+  background: #ffaa00;
+}
+
+.object {
+  background: red;
+  border-radius: 50%;
+}
+
+.force {
+  background: #ff4444;
+}
+
+label {
+  display: block;
+  margin-top: 8px;
+}
+
+.note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #cfefff;
+}
+
+button {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #00bcd4;
+  border: none;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background: #4ddcff;
+}
