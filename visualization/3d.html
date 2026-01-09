@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LEVITAS — 3D Magnetic Containment</title>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(#0b1c2d, #02060c);
+      font-family: Arial, sans-serif;
+    }
+
+    #overlay {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0,0,0,0.65);
+      color: white;
+      padding: 14px;
+      border-radius: 6px;
+      width: 260px;
+      font-size: 13px;
+    }
+
+    #overlay h2 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      color: #00e5ff;
+    }
+
+    .legend-item {
+      margin-bottom: 6px;
+    }
+
+    .box {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .chamber { border: 2px solid #00e5ff; }
+    .magnet { background: #ffcc00; }
+    .object { background: #ff2222; border-radius: 50%; }
+
+    button {
+      margin-top: 6px;
+      width: 100%;
+      padding: 6px;
+      border: none;
+      background: #00e5ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background: #4ddcff;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="overlay">
+  <h2>LEVITAS — 3D View</h2>
+
+  <div class="legend-item">
+    <span class="box chamber"></span>
+    Chamber (non-magnetic shell)
+  </div>
+
+  <div class="legend-item">
+    <span class="box magnet"></span>
+    Electromagnets (active control)
+  </div>
+
+  <div class="legend-item">
+    <span class="box object"></span>
+    Levitated object (payload)
+  </div>
+
+  <p style="font-size:12px; margin-top:8px;">
+    Digital twin of the magnetic containment system.
+  </p>
+
+  <label style="display:block; margin-top:8px;">
+    <input type="checkbox" id="controlToggle3D" checked>
+    Control Active
+  </label>
+
+  <label style="display:block; margin-top:6px;">
+    Noise
+    <input type="range" min="0" max="0.05" step="0.002" value="0"
+           oninput="noiseLevel = parseFloat(this.value)">
+  </label>
+
+  <label style="display:block; margin-top:6px;">
+    Gain
+    <input type="range" min="0.5" max="6" step="0.1" value="3"
+           oninput="Kp = parseFloat(this.value)">
+  </label>
+
+  <label style="display:block; margin-top:6px;">
+    <input type="checkbox" id="gravityToggle3D">
+    Gravity Enabled
+  </label>
+
+
+  <button id="resetBtn">Reset System</button>
+  <button id="backBtn">← Back to 2D View</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
+
+<script>
+  // =====================
+  // Scene & Camera
+  // =====================
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x02060c);
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 50);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  document.body.appendChild(renderer.domElement);
+
+  // =====================
+  // Manual Mouse Rotation
+  // =====================
+  let isDragging = false;
+  let prevMouse = { x: 0, y: 0 };
+  let rotation = { x: 0.4, y: 0.6 };
+
+  renderer.domElement.onmousedown = e => {
+    isDragging = true;
+    prevMouse.x = e.clientX;
+    prevMouse.y = e.clientY;
+  };
+  renderer.domElement.onmouseup = () => isDragging = false;
+  renderer.domElement.onmousemove = e => {
+    if (!isDragging) return;
+    rotation.y += (e.clientX - prevMouse.x) * 0.005;
+    rotation.x += (e.clientY - prevMouse.y) * 0.005;
+    prevMouse.x = e.clientX;
+    prevMouse.y = e.clientY;
+  };
+
+  // =====================
+  // Lighting
+  // =====================
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1);
+  keyLight.position.set(5, 5, 5);
+  scene.add(keyLight);
+
+  // =====================
+  // Chamber
+  // =====================
+  const CHAMBER_LIMIT = 1.5;
+  let systemFailed = false;
+
+  const chamber = new THREE.Mesh(
+    new THREE.BoxGeometry(3, 3, 3),
+    new THREE.MeshStandardMaterial({ color: 0x00e5ff, wireframe: true })
+  );
+  scene.add(chamber);
+
+  // =====================
+  // Electromagnets
+  // =====================
+  const magnetMat = new THREE.MeshStandardMaterial({
+    color: 0xffcc00,
+    emissive: 0xffcc00,
+    emissiveIntensity: 0.3
+  });
+
+  const magnets = [
+    new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.25, 0.25), magnetMat),
+    new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.25, 0.25), magnetMat),
+    new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), magnetMat),
+    new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), magnetMat)
+  ];
+
+  magnets[0].position.set(0,  1.65, 0);
+  magnets[1].position.set(0, -1.65, 0);
+  magnets[2].position.set(-1.65, 0, 0);
+  magnets[3].position.set( 1.65, 0, 0);
+  magnets.forEach(m => scene.add(m));
+
+  // =====================
+  // Payload
+  // =====================
+  const payload = new THREE.Mesh(
+    new THREE.SphereGeometry(0.18, 32, 32),
+    new THREE.MeshStandardMaterial({
+      color: 0xff2222,
+      emissive: 0xff2222,
+      emissiveIntensity: 0.4
+    })
+  );
+  scene.add(payload);
+
+  // =====================
+  // Control & State
+  // =====================
+  let controlActive = true;
+  document.getElementById("controlToggle3D").onchange = e => controlActive = e.target.checked;
+  document.getElementById("gravityToggle3D").onchange = e => {
+    gravityEnabled = e.target.checked;
+  };
+
+  let x = 0, y = 0;
+  let vx = 0.02, vy = -0.015;
+
+  let Kp = 3.0;
+  let Kd = 1.2;
+  let noiseLevel = 0.0;
+
+  // Gravity (true vertical axis)
+  let gravityEnabled = false;
+  const GRAVITY = 1.2;
+
+  // =====================
+  // Animation Loop
+  // =====================
+  function animate() {
+    if (!systemFailed) {
+      let fx = 0, fy = 0;
+
+      if (controlActive) {
+        fx = -Kp * x - Kd * vx;
+        fy = -Kp * y - Kd * vy - (gravityEnabled ? GRAVITY : 0);
+      } else {
+        fx = 0.6 * x + 0.02;
+        fy = 0.6 * y;
+      }
+
+      fx += (Math.random() - 0.5) * noiseLevel;
+      fy += (Math.random() - 0.5) * noiseLevel;
+
+      vx += fx * 0.016;
+      vy += fy * 0.016;
+
+      x += vx * 0.016;
+      y += vy * 0.016;
+
+      if (Math.abs(x) > CHAMBER_LIMIT || Math.abs(y) > CHAMBER_LIMIT) {
+        systemFailed = true;
+        payload.material.color.set(0x555555);
+      }
+
+      const forceMag = Math.sqrt(fx*fx + fy*fy);
+      magnets.forEach(m => {
+        m.material.emissiveIntensity = 0.2 + Math.min(1, forceMag);
+      });
+    }
+
+    payload.position.set(x, y, 0);
+
+    camera.position.set(
+      5 * Math.sin(rotation.y) * Math.cos(rotation.x),
+      5 * Math.sin(rotation.x),
+      5 * Math.cos(rotation.y) * Math.cos(rotation.x)
+    );
+    camera.lookAt(0, 0, 0);
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // =====================
+  // Reset & Navigation
+  // =====================
+  document.getElementById("resetBtn").onclick = () => {
+    x = y = 0;
+    vx = 0.02;
+    vy = -0.015;
+    systemFailed = false;
+    payload.material.color.set(0xff2222);
+  };
+
+  document.getElementById("backBtn").onclick = () => {
+    window.location.href = "index.html";
+  };
+
+  window.onresize = () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  };
+</script>
+
+</body>
+</html>
