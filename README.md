@@ -112,6 +112,8 @@ This repository represents **LEVITAS v1.0** — a complete conceptual and educat
 
 Developed as part of an exploration into active stabilization, control theory, and contactless precision systems.
 
+---
+
 ## License
 
 The project is open-source and free to study and modify. Note that use is permitted only for academic and research purposes.
