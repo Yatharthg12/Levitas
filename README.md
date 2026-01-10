@@ -1,6 +1,6 @@
 # LEVITAS — Active Magnetic Containment via Feedback Control
 
-LEVITAS is an interactive, web-based simulation demonstrating **contactless containment and stabilization of a magnetically responsive object using actively controlled electromagnets**.
+LEVITAS(LEVITation via Active Stabilization) is an interactive, web-based simulation demonstrating **contactless containment and stabilization of a magnetically responsive object using actively controlled electromagnets**.
 
 The project focuses on **control physics**, not visual spectacle — showing why passive magnetic systems are unstable and how real-world levitation requires continuous feedback, sensing, and actuation.
 
