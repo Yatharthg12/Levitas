@@ -109,6 +109,7 @@ This repository represents **LEVITAS v1.0** — a complete conceptual and educat
 ## Author
 
 **Yatharth Garg**
+
 Controlled magnetic levitation simulation
 
 ## License
