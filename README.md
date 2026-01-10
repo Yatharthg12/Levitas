@@ -110,7 +110,7 @@ This repository represents **LEVITAS v1.0** — a complete conceptual and educat
 
 **Yatharth Garg**
 
-Controlled magnetic levitation simulation
+Developed as part of an exploration into active stabilization, control theory, and contactless precision systems.
 
 ## License
 
