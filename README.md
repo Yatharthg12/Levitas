@@ -91,7 +91,7 @@ It should be interpreted as a **control-faithful digital twin**, not a hardware 
 
 OR 
 
-View the deployed project version: 
+View the deployed project version: https://yatharthg12.github.io/Levitas/visualization/index.html
 
 ---
 
